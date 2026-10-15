@@ -9,13 +9,13 @@
             --bg-page: #121212;
             --bg-card: #1e1e1e;
             --text-primary: #e0e0e0;
-            --accent: #00e5ff;
+            --accent: #00e5ff; /* Color Cian */
             --accent-glow: rgba(0, 229, 255, 0.35);
             --border: #333333;
             --input-bg: #2d2d2d;
             --input-text: #ffffff;
-            --btn-copy: #00e5ff;
-            --btn-copy-text: #000000;
+            --btn-open: #00e5ff;
+            --btn-open-text: #000000;
             --btn-clear: #5a1a1a;
             --btn-clear-text: #ffcccc;
         }
@@ -86,6 +86,7 @@
             box-shadow: 0 0 8px var(--accent-glow);
         }
 
+        /* Caja de Link */
         .reference-box {
             border: 1px solid var(--accent);
             border-radius: 8px;
@@ -94,6 +95,7 @@
             background-color: rgba(0, 229, 255, 0.02);
         }
 
+        /* Caja de Resultado con enlace cliqueable */
         .result-container {
             border: 1px solid var(--accent);
             border-radius: 8px;
@@ -104,14 +106,22 @@
             text-align: center;
         }
 
-        .result-text {
+        .result-link {
             color: var(--accent);
             font-weight: bold;
             font-size: 1.05rem;
             word-break: break-all;
-            margin: 0;
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+            transition: opacity 0.2s;
         }
 
+        .result-link:hover {
+            opacity: 0.8;
+        }
+
+        /* Botones de acción */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -133,12 +143,12 @@
             transform: scale(0.98);
         }
 
-        .btn-copy {
-            background-color: var(--btn-copy);
-            color: var(--btn-copy-text);
+        .btn-open {
+            background-color: var(--btn-open);
+            color: var(--btn-open-text);
         }
 
-        .btn-copy:hover {
+        .btn-open:hover {
             opacity: 0.9;
         }
 
@@ -184,32 +194,30 @@
             </div>
         </div>
 
-        <!-- APARTADO 4: RESULTADO Y BOTONES -->
+        <!-- APARTADO 4: ENLACE RESULTADO Y BOTONES -->
         <div class="result-container">
-            <p id="resultText" class="result-text">Seleccione las opciones para generar el link</p>
+            <a id="resultLink" class="result-link" target="_blank" onclick="validarClicLink(event)">Seleccione las opciones para generar el link</a>
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-copy" onclick="copiarLink()">COPIAR</button>
+            <button class="btn btn-open" onclick="abrirLink()">ABRIR LINK</button>
             <button class="btn btn-clear" onclick="limpiarCampos()">LIMPIAR</button>
         </div>
     </div>
 
     <script>
-        /* BASE DE DATOS DE ENLACES */
+        /* BASE DE DATOS DE ENLACES PERSONALIZADA */
         const baseDeDatos = {
             "uso_diario": [
                 { nombre: "DOTPANEL", url: "https://dotpanel.micasino.com/" },
                 { nombre: "MICA.COM", url: "https://micasino.com/" },
                 { nombre: "LIVE AGENT", url: "https://micasino.ladesk.com/agent/index.php#login" },
-                { nombre: "NOMENGLATURA", url: "https://goatedxysen.github.io/Genrador-de-Nomenclaturas-MDP-/" }
-                
-                
+                { nombre: "NOMENCLATURA", url: "https://goatedxysen.github.io/Genrador-de-Nomenclaturas-MDP-/" }
             ],
             "looker": [
                 { nombre: "Buscador de depósitos", url: "https://datastudio.google.com/reporting/942ba719-31c9-47b3-990c-b3e28436436b/page/MYYqD" },
                 { nombre: "TXT", url: "https://datastudio.google.com/reporting/bd9f12d3-871c-44e6-9ef9-62f0fde41948/page/p_1yga8krpqd" },
-                { nombre: "Retiros PagoFacil ", url: "https://datastudio.google.com/reporting/f35792c6-94ee-4732-8995-431e196fd858/page/8oE5D" },
+                { nombre: "Retiros PagoFacil", url: "https://datastudio.google.com/reporting/f35792c6-94ee-4732-8995-431e196fd858/page/8oE5D" },
                 { nombre: "Copia de RETIROS TXT", url: "https://datastudio.google.com/reporting/cad0cdb7-3c80-49b1-a4b3-1ac2c145f1db/page/a1GUF" }
             ],
             "statuspage": [
@@ -222,7 +230,6 @@
                 { nombre: "Kushki", url: "https://status.kushkipagos.com/" },
                 { nombre: "Fintoc", url: "https://status.fintoc.com/" },
                 { nombre: "Khipu", url: "https://status.khipu.com/" }
-                
             ]
         };
 
@@ -232,7 +239,10 @@
             
             selectNombre.innerHTML = '<option value="">Seleccione Nombre...</option>';
             document.getElementById('linkInput').value = '';
-            document.getElementById('resultText').innerText = 'Seleccione las opciones para generar el link';
+            
+            const linkElem = document.getElementById('resultLink');
+            linkElem.innerText = 'Seleccione las opciones para generar el link';
+            linkElem.removeAttribute('href');
 
             if (herramientaSeleccionada && baseDeDatos[herramientaSeleccionada]) {
                 baseDeDatos[herramientaSeleccionada].forEach(item => {
@@ -247,31 +257,53 @@
         function actualizarLink() {
             const urlSeleccionada = document.getElementById('nombreEnlace').value;
             const inputLink = document.getElementById('linkInput');
-            const resultText = document.getElementById('resultText');
+            const linkElem = document.getElementById('resultLink');
 
             if (urlSeleccionada) {
                 inputLink.value = urlSeleccionada;
-                resultText.innerText = urlSeleccionada;
+                linkElem.innerText = urlSeleccionada;
+                linkElem.href = urlSeleccionada;
             } else {
                 inputLink.value = '';
-                resultText.innerText = 'Seleccione las opciones para generar el link';
+                linkElem.innerText = 'Seleccione las opciones para generar el link';
+                linkElem.removeAttribute('href');
             }
         }
 
         function actualizarResultadoManual() {
-            const textoManual = document.getElementById('linkInput').value;
-            document.getElementById('resultText').innerText = textoManual || 'Seleccione las opciones para generar el link';
+            const textoManual = document.getElementById('linkInput').value.trim();
+            const linkElem = document.getElementById('resultLink');
+            
+            if (textoManual) {
+                const urlValida = (textoManual.startsWith('http://') || textoManual.startsWith('https://')) 
+                    ? textoManual 
+                    : 'https://' + textoManual;
+
+                linkElem.innerText = textoManual;
+                linkElem.href = urlValida;
+            } else {
+                linkElem.innerText = 'Seleccione las opciones para generar el link';
+                linkElem.removeAttribute('href');
+            }
         }
 
-        function copiarLink() {
-            const textoACopiar = document.getElementById('resultText').innerText;
-            if (textoACopiar && textoACopiar !== 'Seleccione las opciones para generar el link') {
-                navigator.clipboard.writeText(textoACopiar).then(() => {
-                    const btn = document.querySelector('.btn-copy');
-                    const originalText = btn.innerText;
-                    btn.innerText = '¡COPIADO!';
-                    setTimeout(() => { btn.innerText = originalText; }, 1500);
-                });
+        function abrirLink() {
+            const urlInput = document.getElementById('linkInput').value.trim();
+            if (urlInput) {
+                const urlValida = (urlInput.startsWith('http://') || urlInput.startsWith('https://')) 
+                    ? urlInput 
+                    : 'https://' + urlInput;
+                window.open(urlValida, '_blank');
+            } else {
+                alert('Por favor, selecciona o escribe un enlace primero.');
+            }
+        }
+
+        function validarClicLink(e) {
+            const linkElem = document.getElementById('resultLink');
+            if (!linkElem.hasAttribute('href')) {
+                e.preventDefault();
+                alert('Por favor, selecciona un enlace primero.');
             }
         }
 
@@ -279,7 +311,10 @@
             document.getElementById('herramientas').selectedIndex = 0;
             document.getElementById('nombreEnlace').innerHTML = '<option value="">Seleccione Nombre...</option>';
             document.getElementById('linkInput').value = '';
-            document.getElementById('resultText').innerText = 'Seleccione las opciones para generar el link';
+            
+            const linkElem = document.getElementById('resultLink');
+            linkElem.innerText = 'Seleccione las opciones para generar el link';
+            linkElem.removeAttribute('href');
         }
     </script>
 </body>
